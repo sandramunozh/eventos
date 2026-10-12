@@ -1,0 +1,20 @@
+[Unit]
+Description=API Gestión de Eventos Parque Consotá
+After=network.target
+
+[Service]
+Type=simple
+User=gestion-eventos
+Group=gestion-eventos
+WorkingDirectory=/opt/gestion-eventos/backend
+EnvironmentFile=/etc/gestion-eventos/backend.env
+ExecStart=/opt/gestion-eventos/backend/.venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8000 --workers 2
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+
+[Install]
+WantedBy=multi-user.target
