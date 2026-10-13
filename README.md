@@ -170,6 +170,21 @@ sudo apt install nginx python3-venv python3-pip
 Node.js debe instalarse desde la fuente aprobada por la organización y una versión LTS compatible.
 
 ## nginx en Windows (pruebas locales)
+
+### Inicio rápido con `iniciar.bat`
+En Windows, ejecutar `iniciar.bat` desde la raíz del proyecto. El script es
+idempotente: detecta lo que ya corre, inicia lo faltante y valida todo al final:
+
+1. MySQL de XAMPP (puerto 3309): servicio de Windows `mysql` y, si no hay
+   permisos, arranque manual con `mysqld`.
+2. API FastAPI (8000): uvicorn en su propia ventana; valida `GET /health`
+   (200) y un login con credenciales falsas (401 = base de datos accesible).
+3. Frontend de desarrollo (5173): `npm run dev` en su propia ventana.
+4. nginx (8081): compila el frontend si falta `dist`, sirve el build y valida
+   la SPA, la ruta `/cuenta_cr.faces` y el proxy `/health`.
+5. Imprime el resumen y abre `http://127.0.0.1:8081`. Con el argumento
+   `--auto` omite la pausa y la apertura del navegador (para automatización).
+
 Instalación local ya realizada en este equipo para servir el build del frontend
 con el mismo comportamiento de producción (plantilla: `deploy/nginx/gestion-eventos.conf`).
 
