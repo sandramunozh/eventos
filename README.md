@@ -41,6 +41,70 @@ python -m app.create_admin
 ```
 El comando solicita usuario y contraseña de forma interactiva. No usar credenciales de ejemplo en producción.
 
+### Perfiles de acceso y menú por permisos
+La barra lateral de menú es responsiva y se construye desde la base de datos según el
+perfil (rol) del usuario autenticado. Se apoya en tres tablas:
+
+- `roles`: perfiles de acceso (por ejemplo `ADMIN`, `EVENTOS`).
+- `menu_items`: opciones de menú con relación padre/hijo (`parent_id`) para soportar
+  submenús de varios niveles (`label`, `icon`, `path`, `order_index`, `is_active`).
+- `role_menu`: permisos por perfil y opción (`is_visible`, `can_read`, `can_write`,
+  `can_delete`).
+
+`users.role` almacena el nombre del perfil. El endpoint `GET /api/v1/menu` devuelve
+solo las opciones visibles para el perfil del usuario, incluyendo los nodos padre
+necesarios para llegar a un submenú permitido.
+
+Para crear perfiles, el árbol de menú de ejemplo y sus permisos (idempotente):
+```bash
+python -m app.seed_menu
+```
+
+Endpoints de administración de perfiles (requieren perfil `ADMIN`):
+- `GET  /api/v1/perfiles` y `POST /api/v1/perfiles`.
+- `GET  /api/v1/perfiles/{id}/permisos` y `PUT /api/v1/perfiles/{id}/permisos`.
+- `GET  /api/v1/menu-items` (árbol completo) y `GET /api/v1/usuarios`.
+- `PATCH /api/v1/usuarios/{id}/rol` para asignar el perfil a un usuario.
+
+### Consulta de cuentas (terceros) — opción de menú "Cuentas"
+La ruta `/cuenta_cr.faces` de la nueva aplicación muestra la consulta paginada
+(1 a 20 filas por página) de los clientes consultados, con filtros por
+identificación, nombre, código de cuenta MUF, tercero JDE y nombre del tercero JDE.
+
+El servicio externo WebApiComfamiliar (módulo Facturación) solo permite consultar
+por número de identificación (`GET api/Facturacion/Tercero/{id}` con Bearer Token).
+Por eso el backend actúa como proxy y mantiene una caché local en la tabla
+`cuentas` de cada tercero consultado, lo que habilita el listado paginado y
+filtrado. Endpoints:
+
+- `GET /api/v1/cuentas` — paginado con filtros (`page`, `page_size`,
+  `numero_identificacion`, `nombre`, `codigo`, `tercero`, `nom_tercero`).
+- `GET /api/v1/cuentas/tercero/{numero_identificacion}` — proxy al servicio
+  externo; limpia separadores de miles y guarda el resultado en la caché.
+
+Ambos endpoints exigen que el perfil del usuario tenga visible la opción de menú
+`/cuenta_cr.faces` (`role_menu.is_visible` y `can_read`).
+
+El servicio externo requiere Bearer Token. El backend lo genera automáticamente
+con las credenciales institucionales (`POST /api/login/authenticate`), lo cachea
+en memoria hasta 60 segundos antes de su expiración (~2 h según el claim `exp`
+del JWT) y lo regenera si el servicio responde 401. La respuesta real llega en
+PascalCase (`CuCod`, `CuNumId`, ...); el backend la normaliza al contrato
+camelCase documentado antes de devolverla al frontend.
+
+Variables del backend para el servicio externo (valores reales SOLO en `backend/.env`,
+que está en `.gitignore` y nunca se sube al repositorio):
+```
+EXTERNAL_API_BASE_URL=https://webapinet.comfamiliar.com/api
+EXTERNAL_API_AUTH_URL=https://webapinet.comfamiliar.com/api/login/authenticate
+EXTERNAL_API_USERNAME=USUARIO_INSTITUCIONAL
+EXTERNAL_API_PASSWORD=CLAVE_INSTITUCIONAL
+EXTERNAL_API_TIMEOUT=15
+```
+Las credenciales externas viven únicamente en el backend; el navegador nunca las
+recibe. No escribir credenciales en el código fuente, en el frontend ni en el
+repositorio.
+
 ### Frontend
 ```bash
 cd frontend
@@ -65,7 +129,8 @@ Si MySQL está en otro servidor, no usar `localhost`: restringir el origen a la 
 
 ## Variables del backend
 Configurar `backend/.env` desde `.env.example`. `DATABASE_URL` debe tener el formato:
-`mysql+pymysql://eventos_app:URL_ENCODED_PASSWORD@127.0.0.1:3306/gestion_eventos`
+`mysql+pymysql://eventos_app:URL_ENCODED_PASSWORD@127.0.0.1:3309/gestion_eventos`
+(usar el puerto real del servidor MySQL; en la instalación XAMPP/Consotá es `3309`).
 Codificar caracteres especiales de la contraseña para URL. No subir `.env` a Git ni enviarlo por correo.
 
 ## Instalación en producción (resumen para Tecnología)
