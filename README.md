@@ -169,6 +169,36 @@ sudo apt install nginx python3-venv python3-pip
 ```
 Node.js debe instalarse desde la fuente aprobada por la organización y una versión LTS compatible.
 
+## nginx en Windows (pruebas locales)
+Instalación local ya realizada en este equipo para servir el build del frontend
+con el mismo comportamiento de producción (plantilla: `deploy/nginx/gestion-eventos.conf`).
+
+1. Descargar la versión estable de `https://nginx.org/download/` (usada: `nginx-1.26.3.zip`) y extraer en `C:\nginx`.
+2. La configuración vive en `C:\nginx\conf\nginx.conf`: sirve `C:/eventos/frontend/dist`,
+   envía `/api/` y `/health` a `http://127.0.0.1:8000` y aplica
+   `try_files $uri $uri/ /index.html` para que las rutas `.faces` carguen la SPA.
+3. Reconstruir el frontend tras cambios: `cd frontend && npm run build`.
+4. Administración (desde `C:\nginx`):
+   - Probar configuración: `.\nginx.exe -t`
+   - Iniciar: `Start-Process -FilePath C:\nginx\nginx.exe -WorkingDirectory C:\nginx`
+   - Recargar configuración: `.\nginx.exe -s reload`
+   - Detener: `.\nginx.exe -s stop`
+5. App local: `http://127.0.0.1:8081` (el puerto 80 lo ocupa un servicio del sistema
+   http.sys; liberarlo o cambiar de puerto requiere administrador).
+6. Acceso desde la red: cambiar `listen 127.0.0.1:8081;` por `listen 8081;` y, como
+   administrador, abrir el firewall:
+   `netsh advfirewall firewall add rule name="nginx 8081" dir=in action=allow protocol=TCP localport=8081`
+7. Iniciar con Windows (servicio): descargar NSSM (https://nssm.cc/download), y como
+   administrador:
+   ```
+   nssm install nginx C:\nginx\nginx.exe
+   nssm set nginx AppDirectory C:\nginx
+   nssm start nginx
+   ```
+
+La plataforma de producción institucional sigue siendo Linux con systemd y Nginx
+(según `deploy/systemd/` y `deploy/nginx/`).
+
 ## Endpoints iniciales
 - `GET /health`
 - `POST /api/v1/auth/login`
