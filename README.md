@@ -67,20 +67,21 @@ Endpoints de administración de perfiles (requieren perfil `ADMIN`):
 - `PATCH /api/v1/usuarios/{id}/rol` para asignar el perfil a un usuario.
 
 ### Consulta de cuentas (terceros) — opción de menú "Cuentas"
-La ruta `/cuenta_cr.faces` de la nueva aplicación muestra la consulta paginada
-(1 a 20 filas por página) de los clientes consultados, con filtros por
-identificación, nombre, código de cuenta MUF, tercero JDE y nombre del tercero JDE.
+La ruta `/cuenta_cr.faces` de la nueva aplicación permite consultar los datos de
+un tercero por número de identificación y muestra el resultado en tarjetas:
+identificación, titular, código de cuenta MUF y la coincidencia en JDE
+(identificación, tercero ABAN8 y nombre), cuando existe.
 
 El servicio externo WebApiComfamiliar (módulo Facturación) solo permite consultar
 por número de identificación (`GET api/Facturacion/Tercero/{id}` con Bearer Token).
-Por eso el backend actúa como proxy y mantiene una caché local en la tabla
-`cuentas` de cada tercero consultado, lo que habilita el listado paginado y
-filtrado. Endpoints:
+El backend actúa como proxy, limpia separadores de miles y registra cada consulta
+en la tabla `cuentas`. Endpoints:
 
-- `GET /api/v1/cuentas` — paginado con filtros (`page`, `page_size`,
-  `numero_identificacion`, `nombre`, `codigo`, `tercero`, `nom_tercero`).
-- `GET /api/v1/cuentas/tercero/{numero_identificacion}` — proxy al servicio
-  externo; limpia separadores de miles y guarda el resultado en la caché.
+- `GET /api/v1/cuentas/tercero/{numero_identificacion}` — proxy al servicio externo
+  (usado por la página).
+- `GET /api/v1/cuentas` — consulta paginada con filtros (`page`, `page_size`,
+  `numero_identificacion`, `nombre`, `codigo`, `tercero`, `nom_tercero`),
+  disponible como API para futuras pantallas; la página actual no la usa.
 
 Ambos endpoints exigen que el perfil del usuario tenga visible la opción de menú
 `/cuenta_cr.faces` (`role_menu.is_visible` y `can_read`).

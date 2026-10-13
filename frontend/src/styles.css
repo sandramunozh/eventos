@@ -28,24 +28,9 @@
 @media(max-width:1023px){.menu-toggle,.sidebar-close{display:inline-flex;}}
 .lookup-form{display:flex;gap:.65rem;flex-wrap:wrap;margin-top:1rem}
 .lookup-form input{flex:1;min-width:200px;max-width:340px}
-.lookup-result{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:.7rem;margin-top:1rem}
-.lookup-field{background:#f7fbf8;border:1px solid #e3ede5;border-radius:10px;padding:.6rem .8rem;display:flex;align-items:center;gap:.45rem}
-.lookup-field small{display:block;font-size:.66rem;letter-spacing:.06em;text-transform:uppercase;color:#5d7163;width:100%}
-.lookup-field strong{font-size:.95rem;font-weight:700}
-.lookup-field.ok{background:#e8f5eb;border-color:#cde8d3;color:#236239;font-size:.85rem}
+.lookup-result{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.7rem;margin-top:1rem}
+.lookup-field{background:#f7fbf8;border:1px solid #e3ede5;border-radius:10px;padding:.65rem .85rem;display:flex;flex-direction:column;align-items:flex-start;gap:.3rem}
+.lookup-field small{font-size:.68rem;letter-spacing:.07em;text-transform:uppercase;color:#5d7163}
+.lookup-field strong{font-size:.95rem;font-weight:700;overflow-wrap:anywhere;text-align:left}
+.lookup-field.ok{flex-direction:row;align-items:center;gap:.45rem;background:#e8f5eb;border-color:#cde8d3;color:#236239;font-size:.85rem}
 .lookup-vacio{display:flex;align-items:center;gap:.45rem;margin-top:1rem;font-size:.9rem;color:#7c5b00;background:#fff5d9;border:1px solid #f3e3b5;border-radius:10px;padding:.7rem .9rem}
-.filter-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:.8rem;align-items:end}
-.filter-bar label{font-size:.78rem;gap:.35rem}
-.filter-actions{display:flex;gap:.6rem;flex-wrap:wrap}
-.table-wrap{overflow-x:auto;margin-top:1.1rem}
-.data-table{width:100%;border-collapse:collapse;font-size:.88rem}
-.data-table th{text-align:left;font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;color:#5d7163;padding:.55rem .6rem;border-bottom:2px solid #e1e8e2;white-space:nowrap}
-.data-table td{padding:.55rem .6rem;border-bottom:1px solid #eef3ef;white-space:nowrap}
-.data-table tbody tr:hover{background:#f7fbf8}
-.badge{font-size:.66rem;font-weight:800;padding:.26rem .5rem;border-radius:999px;background:#e8f5eb;color:#236239}
-.badge-vacio{background:#f1f4f1;color:#8a968d}
-.pagination{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-top:1rem;font-size:.85rem;color:#657268}
-.pagination .pager{display:flex;align-items:center;gap:.45rem}
-.pager button{min-width:36px;padding:.45rem .65rem}
-.pager-size{display:inline-flex;align-items:center;gap:.4rem;font-size:.8rem}
-.pager-size select{border:1px solid #ccd8ce;border-radius:8px;padding:.4rem .5rem;background:#fff}
