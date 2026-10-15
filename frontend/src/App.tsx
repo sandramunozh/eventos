@@ -1,6 +1,8 @@
 import { FormEvent, useEffect, useState } from 'react'
 import { CalendarDays, LogOut, PlusCircle, RefreshCw, ShieldCheck, Menu, X, ChevronDown, Construction } from 'lucide-react'
 import CuentasPage from './CuentasPage'
+import TrabajadoresPage from './TrabajadoresPage'
+import AgendaPage from './AgendaPage'
 
 const API = import.meta.env.VITE_API_BASE_URL || '/api/v1'
 type User = { id: number; username: string; role: string }
@@ -67,7 +69,9 @@ export default function App() {
   const [expandedMenu, setExpandedMenu] = useState<Set<number>>(new Set())
   const path = usePath()
   const esCuentas = path.includes('cuenta_cr')
-  const esOtraFaces = !esCuentas && path.includes('.faces')
+  const esTrabajadores = path.includes('consulta_trabajadores')
+  const esAgenda = path.includes('agenda_cr')
+  const esOtraFaces = !esCuentas && !esTrabajadores && !esAgenda && path.includes('.faces')
 
   function toggleMenu(id: number) {
     setExpandedMenu((prev) => {
@@ -117,7 +121,7 @@ export default function App() {
         console.error(menuErr)
         setMenuItems([])
       }
-      if (!window.location.pathname.includes('cuenta_cr')) {
+      if (!window.location.pathname.includes('cuenta_cr') && !window.location.pathname.includes('consulta_trabajadores') && !window.location.pathname.includes('agenda_cr')) {
         setItems(await api('/solicitudes'))
       }
     } catch (err) {
@@ -180,7 +184,7 @@ export default function App() {
         <div className="user-actions"><span>{user.username} · {user.role}</span><button className="icon-button" onClick={logout} aria-label="Cerrar sesión"><LogOut size={18}/><span>Salir</span></button></div>
       </header>
       <main className="content">
-        {esCuentas ? <CuentasPage api={api} /> : esOtraFaces ? (
+        {esCuentas ? <CuentasPage api={api} /> : esTrabajadores ? <TrabajadoresPage api={api} /> : esAgenda ? <AgendaPage api={api} /> : esOtraFaces ? (
           <>
             <div className="page-heading"><div><p className="eyebrow">EN DESARROLLO</p><h1>Módulo en construcción</h1><p className="muted">Esta opción del menú aún no está disponible en la nueva aplicación.</p></div></div>
             <section className="panel"><div className="empty"><Construction size={28}/><strong>Módulo pendiente de migración</strong><span>Las demás opciones del menú se irán habilitando en las siguientes fases.</span></div></section>

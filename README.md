@@ -106,6 +106,57 @@ Las credenciales externas viven únicamente en el backend; el navegador nunca la
 recibe. No escribir credenciales en el código fuente, en el frontend ni en el
 repositorio.
 
+### Consulta de trabajadores — opción de menú "Consulta de trabajadores"
+La ruta `/consulta_trabajadores.faces` permite consultar con un número de
+documento la información del trabajador en BDMUF (tablas
+`viafiliadosfacturaciondatafonov`, `viafiliadosfacturacion`, `tbsubesp` y
+`tbsubespdet`, cargadas con `data/cargar_bdmuf.py`) y muestra:
+
+- Datos del trabajador y la validación de las seis condiciones de la consulta
+  de categoría: `TIPO='T'`, `TRTIPCONTR NOT IN ('I')`, `CATTRAB IN ('A','B')`,
+  `SUCURSAL NOT IN (10,13)`, `CUCLASIFIC NOT IN ('3')` y
+  `EMPORCAJA NOT IN ('0.6','0.06','0.60','6.00')`.
+- Grupo familiar para trabajadores (filas con `CUCODTRABAJADOR` del trabajador)
+  y grupo familiar para beneficiarios (`VIAFILIADOSFACTURACION`: titular + su
+  familia).
+- Subsidios otorgados el mismo día y el mismo mes de la fecha seleccionada
+  (por defecto hoy), con conteos separados por tipo de venta `P` y `R`
+  (`TBSUBESP` + `TBSUBESPDET`, `AUCODESTAD='A'`) y el detalle de los registros.
+
+La búsqueda funciona también para **beneficiarios** (`TIPO='B'`): al consultar
+el documento de un beneficiario se muestran los datos de su fila B, su
+trabajador asociado (`CUCODTRABAJADOR`), el grupo familiar del trabajador y
+los subsidios registrados a nombre del beneficiario (`USR_CUCODB` con su
+propio `CUCOD`).
+
+Endpoint: `GET /api/v1/trabajadores?documento={numero}&fecha={YYYY-MM-DD}`
+(fecha opcional). Exige el permiso del menú `/consulta_trabajadores.faces`.
+La conexión a BDMUF se configura con `MUF_DATABASE_URL` en `backend/.env`
+(solo lectura; `FETCH FIRST` de las consultas originales se implementa como
+`LIMIT 1` por compatibilidad con MariaDB 10.4).
+
+### Agenda del día — opción de menú "Agenda"
+La ruta `/agenda_cr.faces` muestra el calendario de actividades comerciales de
+la tabla `agenda_actividades` (propia de la aplicación), con vistas de **año,
+mes, semana y día**, navegación anterior/siguiente, botón "Fecha actual" y
+chips por día con la hora y la tarea, coloreados por estado (`NO INICIADA`,
+`REALIZADA`, `CANCELADA`, `NO EFECTIVA`, `CREADA ERROR`).
+
+- Al hacer clic en un día se abre la pantalla de detalle con las tarjetas de
+  sus actividades (hora, lugar/empresa, NIT, contacto, correo, teléfono y
+  descripción) y el cambio de estado en línea.
+- El formulario "Nueva actividad" replica el del sistema original: tarea
+  (llamada, visita, feria, stand, charla, virtual, etc.), estado, fecha
+  programada, hora, lugar de la actividad (empresa), NIT/nombre de la
+  empresa, contacto, correo, teléfono y resumen de la reunión.
+
+Endpoints (todos exigen el permiso del menú `/agenda_cr.faces`):
+- `GET /api/v1/agenda?desde={fecha}&hasta={fecha}` — actividades del rango.
+- `POST /api/v1/agenda` — crear actividad (tareas y estados validados contra
+  las listas del sistema original).
+- `GET /api/v1/agenda/{id}` y `PATCH /api/v1/agenda/{id}` — detalle y
+  actualización.
+
 ### Frontend
 ```bash
 cd frontend

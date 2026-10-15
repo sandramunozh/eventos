@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 from datetime import datetime
 from math import ceil
+from datetime import date as tipo_fecha
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm
@@ -8,7 +9,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select, delete, func, or_, and_, cast, String
 from app.config import settings
 from app.database import Base, engine, get_db
-from app.models import User, Solicitud, MenuItem, Role, RoleMenu, Cuenta
+from app.models import User, Solicitud, MenuItem, Role, RoleMenu, Cuenta, AgendaActividad
 from app.schemas import (
     LoginInput,
     UserOutput,
@@ -21,9 +22,14 @@ from app.schemas import (
     PerfilPermisosInput,
     CuentaOutput,
     CuentasPaginaOutput,
+    TrabajadorConsultaOutput,
+    AgendaCreate,
+    AgendaUpdate,
+    AgendaOutput,
 )
 from app.security import verify_password, create_access_token, get_current_user, require_roles
 from app.terceros import consultar_tercero_externo, limpiar_identificacion, normalizar_tercero
+from app import muf
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -345,3 +351,69 @@ def consultar_cuenta_tercero(
         "message": body.get("message", ""),
         "data": data,
     }
+
+
+@app.get(f"{settings.api_prefix}/trabajadores", response_model=TrabajadorConsultaOutput)
+def consultar_trabajador(
+    documento: str,
+    fecha: tipo_fecha | None = None,
+    user: User = Depends(require_menu_access("/consulta_trabajadores.faces")),
+):
+    """Consulta de trabajadores: categoria, condiciones, grupo familiar y subsidios (BDMUF)."""
+    limpio = limpiar_identificacion(documento)
+    if not limpio:
+        raise HTTPException(status_code=400, detail="El número de documento es requerido (4 a 20 caracteres alfanuméricos).")
+    try:
+        return muf.consultar_trabajador(limpio, fecha)
+    except RuntimeError as err:
+        raise HTTPException(status_code=503, detail=str(err))
+
+
+@app.get(f"{settings.api_prefix}/agenda", response_model=list[AgendaOutput])
+def listar_agenda(
+    desde: tipo_fecha,
+    hasta: tipo_fecha,
+    db: Session = Depends(get_db),
+    user: User = Depends(require_menu_access("/agenda_cr.faces")),
+):
+    """Actividades de la agenda entre dos fechas (inclusive)."""
+    if hasta < desde:
+        raise HTTPException(status_code=400, detail="La fecha final no puede ser anterior a la inicial.")
+    if (hasta - desde).days > 400:
+        raise HTTPException(status_code=400, detail="El rango máximo de consulta es de 400 días.")
+    filas = db.scalars(
+        select(AgendaActividad)
+        .where(AgendaActividad.fecha >= desde, AgendaActividad.fecha <= hasta)
+        .order_by(AgendaActividad.fecha.asc(), AgendaActividad.hora.asc(), AgendaActividad.id.asc())
+    ).all()
+    return list(filas)
+
+
+@app.post(f"{settings.api_prefix}/agenda", response_model=AgendaOutput, status_code=201)
+def crear_actividad(payload: AgendaCreate, db: Session = Depends(get_db), user: User = Depends(require_menu_access("/agenda_cr.faces"))):
+    actividad = AgendaActividad(**payload.model_dump(), creado_por_id=user.id)
+    db.add(actividad)
+    db.commit()
+    db.refresh(actividad)
+    return actividad
+
+
+@app.get(f"{settings.api_prefix}/agenda/{{actividad_id}}", response_model=AgendaOutput)
+def obtener_actividad(actividad_id: int, db: Session = Depends(get_db), user: User = Depends(require_menu_access("/agenda_cr.faces"))):
+    actividad = db.get(AgendaActividad, actividad_id)
+    if not actividad:
+        raise HTTPException(status_code=404, detail="Actividad no encontrada")
+    return actividad
+
+
+@app.patch(f"{settings.api_prefix}/agenda/{{actividad_id}}", response_model=AgendaOutput)
+def actualizar_actividad(actividad_id: int, payload: AgendaUpdate, db: Session = Depends(get_db), user: User = Depends(require_menu_access("/agenda_cr.faces"))):
+    actividad = db.get(AgendaActividad, actividad_id)
+    if not actividad:
+        raise HTTPException(status_code=404, detail="Actividad no encontrada")
+    cambios = payload.model_dump(exclude_unset=True)
+    for campo, valor in cambios.items():
+        setattr(actividad, campo, valor)
+    db.commit()
+    db.refresh(actividad)
+    return actividad

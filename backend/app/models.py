@@ -1,5 +1,5 @@
-from datetime import datetime, date
-from sqlalchemy import String, Integer, Date, DateTime, Text, ForeignKey, Boolean
+from datetime import datetime, date, time
+from sqlalchemy import String, Integer, Date, DateTime, Text, ForeignKey, Boolean, Time
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database import Base
 
@@ -72,6 +72,26 @@ class Cuenta(Base):
     nom_tercero: Mapped[str | None] = mapped_column(String(180), nullable=True)
     consultado_en: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     consultado_por_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
+
+
+class AgendaActividad(Base):
+    """Actividad de la agenda comercial (opción de menú 'Agenda del día')."""
+
+    __tablename__ = "agenda_actividades"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    tarea: Mapped[str] = mapped_column(String(60), nullable=False)
+    estado: Mapped[str] = mapped_column(String(30), nullable=False, default="NO INICIADA")
+    fecha: Mapped[date] = mapped_column(Date, nullable=False, index=True)
+    hora: Mapped[time | None] = mapped_column(Time, nullable=True)
+    lugar_empresa: Mapped[str | None] = mapped_column(String(180), nullable=True)
+    empresa_nit: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    empresa_nombre: Mapped[str | None] = mapped_column(String(180), nullable=True)
+    contacto: Mapped[str | None] = mapped_column(String(160), nullable=True)
+    correo_contacto: Mapped[str | None] = mapped_column(String(254), nullable=True)
+    telefono: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    descripcion: Mapped[str | None] = mapped_column(Text, nullable=True)
+    creado_por_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
+    creado_en: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 
 class Solicitud(Base):

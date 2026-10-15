@@ -34,3 +34,60 @@
 .lookup-field strong{font-size:.95rem;font-weight:700;overflow-wrap:anywhere;text-align:left}
 .lookup-field.ok{flex-direction:row;align-items:center;gap:.45rem;background:#e8f5eb;border-color:#cde8d3;color:#236239;font-size:.85rem}
 .lookup-vacio{display:flex;align-items:center;gap:.45rem;margin-top:1rem;font-size:.9rem;color:#7c5b00;background:#fff5d9;border:1px solid #f3e3b5;border-radius:10px;padding:.7rem .9rem}
+.table-wrap{overflow-x:auto;margin-top:1rem}
+.data-table{width:100%;border-collapse:collapse;font-size:.88rem}
+.data-table th{text-align:left;font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;color:#5d7163;padding:.55rem .6rem;border-bottom:2px solid #e1e8e2;white-space:nowrap}
+.data-table td{padding:.55rem .6rem;border-bottom:1px solid #eef3ef;white-space:nowrap}
+.data-table tbody tr:hover{background:#f7fbf8}
+.badge{font-size:.66rem;font-weight:800;padding:.26rem .5rem;border-radius:999px;background:#e8f5eb;color:#236239}
+.badge-vacio{background:#f1f4f1;color:#8a968d}
+.badge-alerta{background:#fff0ef;color:#a52b22}
+.badge-aviso{background:#fff5d9;color:#7c5b00}
+.badge-error{background:#ede9fe;color:#5b21b6}
+.cal-toolbar{display:flex;align-items:center;justify-content:space-between;gap:.8rem;flex-wrap:wrap;margin-bottom:1rem}
+.cal-nav{display:flex;gap:.4rem;align-items:center}
+.cal-titulo{font-size:1.15rem;font-weight:800}
+.cal-vistas{display:flex;gap:.35rem;flex-wrap:wrap}
+.cal-vistas button{padding:.5rem .85rem;font-size:.85rem;background:#edf2ee;color:#263b2d;border:1px solid #dbe5dd}
+.cal-vistas button.activo{background:#166534;color:#fff;border-color:#166534}
+.cal-wrap{overflow-x:auto}
+.cal-grid.mes{display:grid;grid-template-columns:repeat(7,minmax(92px,1fr));min-width:644px}
+.cal-enc{padding:.5rem;text-align:center;font-size:.72rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#5d7163;background:#f4f8f5;border-bottom:1px solid #e1e8e2}
+.cal-celda{border-right:1px solid #e1e8e2;border-bottom:1px solid #e1e8e2;min-height:104px;padding:.35rem;cursor:pointer;background:#fff;display:flex;flex-direction:column;gap:.28rem}
+.cal-celda:hover{background:#f7fbf8}
+.cal-celda.otro{background:#fafcfa}
+.cal-celda.otro .cal-num{color:#9aa79d}
+.cal-num{font-size:.78rem;font-weight:700;width:24px;height:24px;display:grid;place-items:center;border-radius:999px}
+.cal-celda.hoy .cal-num{background:#166534;color:#fff}
+.cal-chip{font-size:.66rem;font-weight:700;background:#e8f5eb;color:#236239;border-radius:6px;padding:.18rem .35rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cal-chip.no-iniciada{background:#f1f4f1;color:#5d7163}
+.cal-chip.cancelada{background:#fff0ef;color:#a52b22}
+.cal-chip.noefectiva{background:#fff5d9;color:#7c5b00}
+.cal-chip.creada-error{background:#ede9fe;color:#5b21b6}
+.cal-chip.mas{background:#f1f4f1;color:#6a786e}
+.anio-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:1rem}
+.mini-mes{border:1px solid #e1e8e2;border-radius:12px;padding:.6rem;cursor:pointer;background:#fff}
+.mini-mes:hover{background:#f7fbf8;border-color:#cde8d3}
+.mini-mes h3{font-size:.85rem;margin:.1rem 0 .5rem;text-align:center}
+.mini-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;font-size:.68rem}
+.mini-num{display:grid;place-items:center;padding:.16rem 0;border-radius:5px;color:#42513f;min-height:20px}
+.mini-num.mini-enc{font-weight:800;color:#5d7163}
+.mini-num.hoy{background:#166534;color:#fff}
+.mini-num.con-actividades{background:#e8f5eb;color:#236239;font-weight:800}
+.sem-grid{display:grid;grid-template-columns:repeat(7,minmax(132px,1fr));gap:.6rem}
+.sem-col{border:1px solid #e1e8e2;border-radius:12px;padding:.5rem;background:#fff;cursor:pointer;min-height:110px;display:flex;flex-direction:column;gap:.3rem}
+.sem-col:hover{background:#f7fbf8}
+.sem-col.hoy{border-color:#166534}
+.sem-enc{font-size:.75rem;font-weight:800;color:#5d7163;text-transform:uppercase;letter-spacing:.05em}
+.sem-vacio{font-size:.72rem;color:#8a968d}
+.agenda-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:.9rem;margin-top:.9rem}
+.agenda-card{border:1px solid #e0e8e1;border-radius:12px;padding:.9rem;background:#fff}
+.agenda-tarea{font-size:.95rem}
+.agenda-meta{display:flex;flex-wrap:wrap;gap:.6rem;margin:.55rem 0;font-size:.8rem;color:#657268}
+.agenda-meta span{display:inline-flex;align-items:center;gap:.3rem}
+.agenda-empresa{font-size:.8rem;color:#55705d;margin:.2rem 0}
+.agenda-desc{font-size:.85rem;color:#4a5a4e;white-space:pre-wrap;border-top:1px dashed #e3ede5;padding-top:.5rem;margin:.4rem 0 0}
+.agenda-accion{margin-top:.6rem}
+.agenda-accion label{font-size:.78rem;flex-direction:row;align-items:center;gap:.5rem}
+.agenda-accion select{border:1px solid #ccd8ce;border-radius:8px;padding:.4rem .5rem;background:#fff}
+@media(max-width:760px){.sem-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.cal-titulo{width:100%;text-align:center;order:3}}

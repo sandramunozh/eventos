@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     external_api_username: str = ""
     external_api_password: str = ""
     external_api_timeout: int = 15
+    muf_database_url: str = ""
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
